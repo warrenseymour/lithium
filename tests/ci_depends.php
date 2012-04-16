@@ -60,14 +60,6 @@ class PhpExtensions {
 	);
 
 	/**
-	 * After instantiation holds the current PHP version.
-	 *
-	 * @see http://php.net/phpversion
-	 * @var string Current PHP version.
-	 */
-	protected $_phpVersion;
-
-	/**
 	 * After instantiation holds the path to loaded PHP configuration file.
 	 *
 	 * @see http://php.net/php_ini_loaded_file
@@ -81,7 +73,6 @@ class PhpExtensions {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->_phpVersion = phpversion();
 		$this->_iniPath = php_ini_loaded_file();
     }
 
@@ -92,9 +83,10 @@ class PhpExtensions {
 
 			if (isset($extension['require']['php'])) {
 				$version = $extension['require']['php'];
-				if (!version_compare($this->_phpVersion, $version[1], $version[0])) {
+
+				if (!version_compare(PHP_VERSION, $version[1], $version[0])) {
 					$message = " => not installed, requires a PHP version %s %s (%s installed)\n";
-					printf($message, $version[0], $version[1], $this->_phpVersion);
+					printf($message, $version[0], $version[1], PHP_VERSION);
 					return;
 				}
 			}
