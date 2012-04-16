@@ -12,6 +12,7 @@ $installer->install('memcached');
 $installer->install('mongo');
 
 class PhpExtensions {
+
 	/**
 	 * Holds build, configure and install instructions for PHP extensions.
 	 *
