@@ -432,6 +432,7 @@ class Validator extends \lithium\core\StaticObject {
 		$defaults = array(
 			'notEmpty',
 			'message' => null,
+			'flatten' => true,
 			'required' => true,
 			'skipEmpty' => false,
 			'format' => 'any',
@@ -449,6 +450,8 @@ class Validator extends \lithium\core\StaticObject {
 
 			$errors = array();
 			$events = (array) (isset($options['events']) ? $options['events'] : null);
+
+			$unflattened = $values;
 			$values = Set::flatten($values);
 
 			foreach ($rules as $field => $rules) {
@@ -461,10 +464,13 @@ class Validator extends \lithium\core\StaticObject {
 					$rule += $options + compact('values');
 					list($name) = $rule;
 
+					if (empty($values[$field]) && empty($unflattened[$field]) && $rule['skipEmpty']) {
+						continue;
+					}
 					if ($events && $rule['on'] && !array_intersect($events, (array) $rule['on'])) {
 						continue;
 					}
-					if (!array_key_exists($field, $values)) {
+					if ($rule['flatten'] && !array_key_exists($field, $values)) {
 						if ($rule['required']) {
 							$errors[$field][] = $rule['message'] ?: $key;
 						}
@@ -473,11 +479,9 @@ class Validator extends \lithium\core\StaticObject {
 						}
 						continue;
 					}
-					if (empty($values[$field]) && $rule['skipEmpty']) {
-						continue;
-					}
 
-					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
+					$value = $rule['flatten'] ? $values[$field] : $unflattened[$field];
+					if (!$self::rule($name, $value, $rule['format'], $rule + $options)) {
 						$errors[$field][] = $rule['message'] ?: $key;
 
 						if ($rule['last']) {
