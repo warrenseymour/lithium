@@ -751,6 +751,14 @@ class MongoDbTest extends \lithium\test\Unit {
 			$this->assertInstanceOf('MongoId', $result['$or'][$i][$key]);
 			$this->assertEqual($conditions['$or'][$i][$key], (string) $result['$or'][$i][$key]);
 		}
+
+		$conditions = array('title' => array('$exists' => true));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('tags' => array('$exists' => true));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
 	}
 
 	public function testMultiOperationConditions() {
